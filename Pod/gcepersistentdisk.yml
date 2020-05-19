@@ -1,0 +1,16 @@
+apiVersion: v1
+Kind: pod
+metadata:
+  name: httpd-pd
+spec:
+  containers:
+    - name: httpd
+      image: httpd:latest
+      volumeMounts:
+        - mountPath: /test-pd
+          name: httpd-volume
+  volumes:
+    - name: httpd-volume
+      gcePersistentDisk:
+        pdNAME: my-data-disk
+        fsType: ext4

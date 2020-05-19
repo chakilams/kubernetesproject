@@ -1,0 +1,30 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: myapp
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: myapp
+        type: java
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '8088'
+    spec:
+      containers:
+      - name: tomcatxml
+        image: chakilams3/jmxtomcat:v1
+        ports:
+        - containerPort: 8080
+        env:
+        - name: JAVA_AGENT_PORT
+          value: "8088"
+        resources:
+          requests:
+            memory: "1024Mi"
+            cpu: "1"
+          limits:
+            memory: "1024Mi"
+            cpu: "1"

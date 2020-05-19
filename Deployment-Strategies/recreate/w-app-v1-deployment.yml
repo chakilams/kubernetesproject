@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:
+  labels:
+    app:
+    type:
+spec:
+  template:
+  replicas:
+  selector:
+    matchLabels:
+      app: my-app
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: my-app
+

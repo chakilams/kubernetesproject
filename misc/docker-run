@@ -1,0 +1,21 @@
+docker run \
+  --volume=/:/rootfs:ro \
+  --volume=/var/run:/var/run:ro \
+  --volume=/sys:/sys:ro \
+  --volume=/var/lib/docker/:/var/lib/docker:ro \
+  --volume=/dev/disk/:/dev/disk:ro \
+  --publish=8080:8080 \
+  --detach=true \
+  --name=cadvisor \
+  gcr.io/google-containers/cadvisor:v0.35.0
+
+
+
+
+
+curl -s https://api.github.com/repos/kubernetes-sigs/kustomize/releases |\
+grep browser_download |\
+grep download/kustomize |\
+grep -m 1 $opsys |\
+cut -d '"' -f 4 |\
+xargs curl -O -L

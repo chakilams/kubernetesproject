@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apache-deployment
+  labels:
+    app: http
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: http
+  template:
+    metadata:
+      labels:
+        app: http
+    spec:
+      containers:
+      - name: http
+        image: httpd:latest
+        volumeMounts:
+          - mountPath: /test-pd
+            name: httpd-volume
+        ports:
+        - containerPort: 80
+      volumes:
+      - name: httpd-volume
+        gcePersistentDisk:
+          pdNAME: my-data-disk
+          fsType: ext4

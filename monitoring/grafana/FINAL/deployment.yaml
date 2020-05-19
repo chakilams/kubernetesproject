@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: exporter-deployment
+spec:
+  selector:
+    matchLabels:
+      app: exporter
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: exporter
+      annotations:
+        prometheus.io/scrape: 'true'
+    spec:
+      containers:
+      - name: exporter
+        image: chakilams3/bothwars:v1
+        ports:
+        - containerPort: 8080

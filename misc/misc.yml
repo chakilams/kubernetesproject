@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pd
+spec:
+  containers:
+  - image: k8s.gcr.io/test-webserver
+    name: test-container
+    volumeMounts:
+    - mountPath: /test-pd
+      name: test-volume
+  volumes:
+  - name: test-volume
+    # This GCE PD must already exist.
+    gcePersistentDisk:
+      pdName: my-data-disk
+      fsType: ext4
+
+apiVersion: v1
+Kind: pod
+metadata:
+  name: httpd-pd
+spec:
+  containers:
+    - name: httpd
+      image: httpd:latest
+      volumeMounts:
+        - mountPath: /test-pd
+          name: httpd-volume
+  volumes:
+    - name: httpd-volume
+      gcePersistentDisk:
+        pdNAME: my-data-disk
+        fsType: ext4
+
+
+docker run -d --name cloud-discovery --restart=always -e BASIC_AUTH_USERNAME=admin -e BASIC_AUTH_PASSWORD=pass -e PORT=9083 -p 9083:9083  twistlock/cloud-discovery
+
+SERVICE_ACCOUNT=$(cat <service_account_secret> | base64 | tr -d '\n')
+curl -k -v -u admin:pass --raw --data '{"credentials": [{"secret":"'${SERVICE_ACCOUNT}'", "provider":"gcp"}]}' https://localhost:9083/discover

@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mywebservice
+spec:
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mywebserver
+spec:
+  replicas: 4
+  strategy:
+	type: RollingUpdate
+	rollingUpdate:
+  	maxSurge: 1
+  	maxUnavailable: 1
+  selector:
+	matchLabels:
+  	app: nginx
+  template:
+	metadata:
+  	labels:
+    	app: nginx
+	spec:
+  	containers:
+  	- image: magalixcorp/mywebserver:1
+      name: nginx
+      readinessProbe:
+      	httpGet:
+        	path: /
+        	port: 80
+        	httpHeaders:
+        	- name: Host
+          	value: K8sProbe
+    - command:
+        - /usr/bin/exporter
+        - -nginx.scrape-uri
+        - http://127.0.0.1:8080/status
+        image: docker.io/bitnami/nginx-exporter:0.6.0-debian-10-r36
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /metrics
+            port: metrics
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: metrics
+        ports:
+          - containerPort: 9113
+            name: metrics
+            protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /metrics
+            port: metrics
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
